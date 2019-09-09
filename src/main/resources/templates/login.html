@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人事管理系统</title>
+    <link rel="shortcut icon" th:href="@{/static/images/favicon.ico}" type="image/x-icon" />
+    <link rel="stylesheet" th:href="@{/static/css/font.css}">
+    <link rel="stylesheet" th:href="@{/static/css/login.css}">
+    <link rel="stylesheet" th:href="@{https://cdn.bootcss.com/Swiper/3.4.2/css/swiper.min.css}">
+    <script type="text/javascript" th:src="@{https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{https://cdn.bootcss.com/Swiper/3.4.2/js/swiper.jquery.min.js}"></script>
+    <script th:src="@{/static/lib/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/static/js/login.js}"></script>
+    <script type="text/javascript" th:src="@{/static/js/xadmin.js}"></script>
+
+
+</head>
+<body>
+    <div class="login-logo"><h1 style="color: rgba(69,56,35,0.71);font-size: 32px">公司员工内部系统</h1></div>
+    <div class="login-box">
+        <form class="layui-form layui-form-pane">
+              
+            <h3>登录你的帐号</h3>
+            <label class="login-title">帐号</label>
+            <div class="layui-form-item">
+                <label class="layui-form-label login-form"><i class="iconfont">&#xe6b8;</i></label>
+                <div class="layui-input-inline login-inline">
+                  <input type="text" name="username" lay-verify="required" placeholder="请输入你的帐号" autocomplete="off" class="layui-input" th:value="${preName}">
+                </div>
+            </div>
+            <label class="login-title">密码</label>
+            <div class="layui-form-item">
+                <label class="layui-form-label login-form"><i class="iconfont">&#xe82b;</i></label>
+                <div class="layui-input-inline login-inline">
+                  <input type="password" name="password" lay-verify="required" placeholder="请输入你的密码" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-warning pull-right" lay-submit lay-filter="login"  type="submit">登录</button>
+                <div class="forgot"><a href="#" class="forgot" id="forget">忘记帐号或者密码</a></div>
+            </div>
+        </form>
+    </div>
+    <!-- 背景切换开始 -->
+    <div class="bg-changer">
+        <div class="swiper-container changer-list">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide"><img class="item" th:src="@{/static/images/b.jpg}" alt=""></div>
+                <div class="swiper-slide"><img class="item" th:src="@{/static/images/c.jpg}" alt=""></div>
+                <div class="swiper-slide"><img class="item" th:src="@{/static/images/d.jpg}" alt=""></div>
+                <div class="swiper-slide"><img class="item" th:src="@{/static/images/e.jpg}" alt=""></div>
+                <div class="swiper-slide"><img class="item" th:src="@{/static/images/f.jpg}" alt=""></div>
+                <div class="swiper-slide"><img class="item" th:src="@{/static/images/g.jpg}" alt=""></div>
+                <div class="swiper-slide"><img class="item" th:src="@{/static/images/k.jpg}" alt=""></div>
+                <div class="swiper-slide"><img class="item" th:src="@{/static/images/i.jpg}" alt=""></div>
+                <div class="swiper-slide"><img class="item" th:src="@{/static/images/j.jpg}" alt=""></div>
+                <div class="swiper-slide"><img class="item" th:src="@{/static/images/v.jpg}" alt=""></div>
+                <div class="swiper-slide"><span class="reset">初始化</span></div>
+            </div>
+        </div>
+        <div class="bg-out"></div>
+        <div id="changer-set"><i class="iconfont">&#xe696;</i></div>
+    </div>
+    <!-- 背景切换结束 -->
+    <script>
+        $(document).ready(function () {
+            if (window != top) {
+                top.location.href = location.href;
+            }
+            /*
+            layui.use('layer', function(){
+                var $ = layui.jquery, layer = layui.layer;
+                layer.alert('登录超时,请重新登录', {icon: 4});
+            });
+            */
+        });
+    </script>
+    <script th:inline="javascript">
+        var path=[[${#request.contextPath}]];
+    </script>
+    <script th:inline="none" type="text/javascript">
+        $(function  () {
+            layui.use(['form'],
+            function() {
+                //$ = layui.jquery;//此$符号会影响ajax的$符号
+                var form = layui.form(),
+                layer = layui.layer;
+                $('button').click(function(event) {
+                    //操作
+                    event.preventDefault();//阻止其默认行为
+                });
+                //监听提交
+                form.on('submit(login)',
+                function(data) {
+                    var param=$("form").serialize();
+                    $.ajax({
+                        url:path+"/empLogin",
+                        data:param,
+                        type:"POST",
+                        dataType:"json",
+                        success: function(data){
+                            if(data.status=="ok"){
+                                location.href=path+"/home";
+                            }else{
+                                layer.msg(data.msg, {
+                                    anim: 5
+                                    ,time: 1000
+                                });
+                            }
+                        }
+                    });
+                    return false;//这个地方一定要变为false，否则没有用的
+                });
+            });
+        });
+    </script>
+    <script type="text/javascript" th:src="@{/stat0ic/js/use.js}"></script>
+    <script th:inline="javascript">
+        var path=[[${#request.contextPath}]];
+    </script>
+    <script th:inline="none" type="text/javascript">
+        $("#forget").click(function () {
+            var username=$("#username").text();
+            var param="username="+username;
+            x_admin_show('重置密码',path+'/forget?'+param,'600','400');
+        });
+
+    </script>
+</body>
+</html>

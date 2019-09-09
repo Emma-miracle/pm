@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>人事管理系统</title>
+    <link rel="stylesheet" th:href="@{/static/assets/css/layui.css}">
+    <link rel="stylesheet" th:href="@{/static/assets/css/view.css}"/>
+</head>
+<body class="layui-view-body">
+    <div class="layui-content">
+        <div class="layui-col-sm12 layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-tab layui-tab-brief">
+
+                    <blockquote class="layui-elem-quote" style="border-left-color:#177ce3;background-color: white">欢迎管理员：
+                        <span style="color: red" th:text="${session.user}"></span>
+                        ！当前时间:<span th:text="${#dates.format(new java.util.Date().getTime(),'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row layui-col-space20">
+            <div class="layui-col-sm6 layui-col-md3">
+                <div class="layui-card">
+                    <div class="layui-card-body chart-card">
+                        <div class="chart-header">
+                            <div class="metawrap">
+                                <div class="meta">
+                                    <span>总员工数</span>
+                                </div>
+                                <div class="total" th:text="${empCount}"></div>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <div class="contentwrap">
+
+                            </div>
+                        </div>
+                        <div class="chart-footer">
+                            <div class="field">
+                                <span>日更新量</span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm6 layui-col-md3">
+                <div class="layui-card">
+                    <div class="layui-card-body chart-card">
+                        <div class="chart-header">
+                            <div class="metawrap">
+                                <div class="meta">
+                                    <span>总部门数</span>
+                                </div>
+                                <div class="total" th:text="${deptCount}"></div>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <div class="contentwrap">
+
+                            </div>
+                        </div>
+                        <div class="chart-footer">
+                            <div class="field">
+                                <span>日更新量</span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm6 layui-col-md3">
+                <div class="layui-card">
+                    <div class="layui-card-body chart-card">
+                        <div class="chart-header">
+                            <div class="metawrap">
+                                <div class="meta">
+                                    <span>总职务数</span>
+                                </div>
+                                <div class="total" th:text="${jobCount}"></div>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <div class="contentwrap">
+
+                            </div>
+                        </div>
+                        <div class="chart-footer">
+                            <div class="field">
+                                <span>日更新量</span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm6 layui-col-md3">
+                <div class="layui-card">
+                    <div class="layui-card-body chart-card">
+                        <div class="chart-header">
+                            <div class="metawrap">
+                                <div class="meta">
+                                    <span>总权限数</span>
+                                </div>
+                                <div class="total" th:text="${authCount}"></div>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <div class="contentwrap">
+
+                            </div>
+                        </div>
+                        <div class="chart-footer">
+                            <div class="field">
+                                <span>日更新量</span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm12 layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-tab layui-tab-brief">
+                        <ul class="layui-tab-title">
+                            <li class="layui-this">系统通知</li>
+                            <li>系统信息</li>
+                            <li>开发者</li>
+                            <li>公司信息</li>
+                        </ul>
+                        <div class="layui-tab-content">
+                            <div class="layui-tab-item layui-show">
+                                <table class="layui-table" lay-skin="line">
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <a class="x-a" href="/" target="_blank">处理部门信息、职务信息、员工信息、请假信息等</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a class="x-a" href="/" target="_blank">交流qq号:(839650334)</a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="layui-tab-item">
+                                <table class="layui-table" style="border: 1px  solid white">
+                                    <tbody>
+                                    <tr>
+                                        <th>用户名</th>
+                                        <td th:text="${userName}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>计算机名</th>
+                                        <td th:text="${computerName}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>计算机域名</th>
+                                        <td th:text="${userDomain}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>本地ip地址</th>
+                                        <td th:text="${ip}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>本地主机名</th>
+                                        <td th:text="${HostName}">5.6.27</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Java的运行环境版ip本</th>
+                                        <td th:text="${javaVersion}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>操作系统的名称</th>
+                                        <td th:text="${osName}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>操作系统的构架</th>
+                                        <td th:text="${osArch}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>操作系统的版本</th>
+                                        <td th:text="${osVersion}"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="layui-tab-item">
+                                <table class="layui-table">
+                                    <tbody>
+                                    <tr>
+                                        <th>版权所有</th>
+                                        <td>wxf(wxf)
+                                            <a href="" class='x-a' target="_blank">微博</a></td>
+                                    </tr>
+                                    <tr>
+                                        <th>开发者</th>
+                                        <td th:text="${name}"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="layui-tab-item">
+                                &nbsp;&nbsp;请等待后续
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/assets/layui.all.js}"></script>
+    <script>
+     var element = layui.element;
+    </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hwua.dao.CountMapper">
+    <select id="countEmps" resultType="int">
+        select count(*)
+        from sys_user
+    </select>
+
+    <select id="countJobs" resultType="int">
+        select count(*)
+        from job
+    </select>
+
+    <select id="countDepts" resultType="int">
+        select count(*)
+        from dept
+    </select>
+
+    <select id="countAuths" resultType="int">
+        select count(*)
+        from sys_auth
+    </select>
+
+
+</mapper>

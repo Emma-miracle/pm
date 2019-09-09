@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>人事管理系统</title>
+    <link rel="icon" th:href="@{/static/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}">
+    <link rel="stylesheet" th:href="@{/static/assets/css/view.css}"/>
+    <script type="text/javascript" th:src="@{https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/static/js/xadmin.js}"></script>
+    <script type="text/javascript" th:src="@{/static/js/use.js}"></script>
+</head>
+<body class="layui-view-body">
+    <div class="layui-content">
+        <div class="layui-page-header">
+            <div class="pagewrap">
+                <span class="layui-breadcrumb">
+                  <a href="">首页</a>
+                  <a href="">公司管理</a>
+                  <a><cite>职务信息</cite></a>
+
+                </span>
+                <h2 class="title">
+                    职务
+                </h2>
+
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <div class="form-box">
+                        <button class="layui-btn layui-btn-blue" id="btn-add"><i class="layui-icon">&#xe654;</i>新增</button>
+                        <button class="layui-btn layui-btn-blue" data-type="dels" id="btn-dels"><i class="layui-icon"></i>批量删除</button>
+                        <button class="layui-btn layui-btn-blue" id="btn-reshpage">刷新页面</button>
+                        <button class="layui-btn layui-btn-blue" id="btn-refresh">刷新表格</button>
+                        <table class="layui-table" id="jobs" lay-filter="jobs" width="100%"></table>
+                        <!---->
+                        <script type="text/html" id="toolbarDemo">
+                            <div class="layui-btn-container">
+                                <button class="layui-btn layui-btn-sm" lay-event="add">
+                                    <i class="layui-icon">&#xe654;</i>
+                                    添加
+                                </button>
+                            </div>
+                        </script>
+                        <!-- 操作列 -->
+                        <script type="text/html" id="oper-col">
+                            <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">编辑</a>
+                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script th:inline="javascript">
+        var path=[[${#request.contextPath}]];
+    </script>
+    <script th:inline="none" type="text/javascript">
+        layui.use('table', function(){
+            var table = layui.table;
+            var renderTable= function(){
+                //方法级渲染
+                table.render({
+                    elem: '#jobs'
+                    ,url: path+'/getJsonJobs'
+                    ,cols: [[
+                        {checkbox: true,LAY_CHECKED:false}
+                        ,{type: 'numbers',title:'序号'}
+                        ,{field:'job_type', title: '职务类型', width:90}
+                        ,{field:'job_name', title: '职务名称', width:100, sort: true}
+                        ,{field:'job_code', title: '职务编码', width:102, sort: true,edit:true}
+                        ,{field:'job_desc', title: '职务描述', width:350}
+                        ,{field:'job_salary', title: '职务薪资', width:100}
+                        ,{templet: '#oper-col', title: '操作',width:'180'}
+                    ]]
+                    ,id:'checkDel'
+                    ,page: true
+                });
+            };
+
+            renderTable();
+
+            table.on('checkbox(jobs)', function(obj){
+                console.log(obj)
+            });
+
+            //批量删除提交xx
+            var $=layui.$,active={
+                dels:function () {
+                    var checkStatus = table.checkStatus('checkDel')
+                        , data = checkStatus.data;
+                    console.log(checkStatus);
+                    if (data == "") {
+                        layer.msg('请选择要删除的选项!', {icon: 1, time: 1000});;
+                    }else{
+                        //获取所有要删除的ID
+                        var ids = [];
+                        for(var i in data) {
+                            ids[i] = data[i].job_id;//得到复选框的值
+                        }
+                        console.log(ids);
+                        layer.confirm('确认要删除吗？', function (index) {
+                            $.ajax({
+                                url: path + "/delJobs",
+                                data: {'ids': ids},
+                                type: "POST",
+                                dataType: "html",
+                                traditional: true,
+                                success: function (data) {
+                                    if (data== "ok") {
+                                        layer.msg('删除成功!', {icon: 6, time: 1000});
+                                        renderTable();
+                                    } else {
+                                        layer.msg("删除失败,您没有权限或网络异常!", {icon: 4, time: 1500});
+                                    }
+                                }
+                            });
+                        });
+                    }
+                }
+            };
+            $('#btn-dels').on('click', function(){
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            //添加数据
+            $("#btn-add").click(function () {
+                x_admin_show('添加职务',path+'/admin_job_add','350','370');
+            });
+
+            $('#btn-reshpage').click(function () {
+                location.replace(location.href);
+            });
+
+            $('#btn-refresh').click(function () {
+                renderTable();
+            });
+
+            //监听工具条
+            table.on('tool(jobs)', function(obj){
+                var data = obj.data;
+                var layEvent = obj.event;
+                if (layEvent === 'del') {
+                    layer.confirm('确认要删除吗？', function (index) {
+                        var param = "&job_id="+data.job_id;
+                        console.log(data.job_name);
+                        console.log(param);
+                        $.ajax({
+                            url: path + "/delJob",
+                            data: param,
+                            type: "POST",
+                            dataType: "html",
+                            success: function (data) {
+                                if (data == "ok") {
+                                    layer.msg('删除成功!', {icon: 6, time: 1000});
+                                    renderTable();
+                                } else {
+                                    layer.msg("删除失败,您没有权限或网络异常!", {icon: 4, time: 1500});
+                                }
+                            }
+                        });
+                    });
+                }  else if (layEvent === 'edit') {
+                    var param="job_id="+data.job_id+"&job_type="+data.job_type
+                        +"&job_name="+data.job_name +"&job_code="+data.job_code
+                        +"&job_desc="+data.job_desc +"&job_salary="+data.job_salary;
+                    console.log(param);
+                    x_admin_show('编辑职务',path+'/admin_job_edit?'+param,'350','370')
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>

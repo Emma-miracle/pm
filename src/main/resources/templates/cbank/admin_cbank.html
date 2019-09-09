@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>人事管理系统</title>
+    <link rel="icon" th:href="@{/static/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/static/css/font.css}">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}">
+    <script type="text/javascript" th:src="@{https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js}"></script>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/static/js/xadmin.js}"></script>
+    <link rel="stylesheet" th:href="@{/static/assets/css/view.css}"/>
+</head>
+<body class="layui-view-body">
+    <div class="layui-content">
+        <div class="layui-page-header">
+            <div class="pagewrap">
+                <span class="layui-breadcrumb">
+                  <a href="">首页</a>
+                  <a href="">资产管理</a>
+                  <a><cite>公司银行账户</cite></a>
+                </span>
+                <h2 class="title">公司账户信息</h2>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-card">
+
+                <div class="layui-card-body">
+                    <div class="form-box">
+                        <div style="text-align: right">
+                            <button class="layui-btn layui-btn-blue" id="btn-reshpage">刷新页面</button>
+                        </div>
+                        <div style="margin: 0 auto;width: 40%" >
+                            <!--表单-->
+                            <form class="layui-form layui-card-body" action="">
+                                <input type="hidden" name="cbank_id" >
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">银行账户</label>
+                                    <div class="layui-input-block">
+                                        <input type="number" name="cbank_account" required  lay-verify="required" placeholder="请输入公司银行账户" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">账户类型</label>
+                                    <div class="layui-input-block">
+                                        <select name="cbank_account_type" lay-verify="required">
+                                            <option value="">--请选择公司银行账户--</option>
+                                            <option value="建设银行">建设银行</option>
+                                            <option value="华夏银行">华夏银行</option>
+                                            <option value="农业银行">农业银行</option>
+                                            <option value="工商银行">工商银行</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">开户行</label>
+                                    <div class="layui-input-block">
+                                        <input type="number" name="cbank_account_city" required  lay-verify="required" placeholder="请输入公司银行账户开户行" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item layui-form-text">
+                                    <label class="layui-form-label">备注</label>
+                                    <div class="layui-input-block">
+                                        <textarea name="remarks" placeholder="请输入内容" class="layui-textarea"></textarea>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <div class="layui-input-block">
+                                        <button class="layui-btn layui-btn-blue" lay-submit lay-filter="save">立即提交</button>
+                                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script th:inline="javascript">
+        var path=[[${#request.contextPath}]];
+    </script>
+
+    <script>
+        //刷新页面
+        $('#btn-reshpage').click(function () {
+            location.replace(location.href);
+        });
+        layui.use(['form', 'layer'], function () {
+            $ = layui.jquery;
+            var form = layui.form
+                , layer = layui.layer;
+
+            //监听提交
+            form.on('submit(save)', function (data) {
+                var param = data.field;
+                $.ajax({
+                    url: path + "/addOrUpdateDept",
+                    data: param,
+                    type: "post",
+                    dataType: "html",
+                    traditional: true,
+                    success: function (data) {
+                        if (data == "ok") {
+                            layer.alert("提交成功", {icon: 6}, function () {
+                                // 获得frame索引
+                                var index = parent.layer.getFrameIndex(window.name);
+                                //关闭当前frame
+                                parent.layer.close(index);
+                                window.parent.location.reload();
+                            });
+                        } else {
+                            layer.msg("提交失败，当前网络异常!");
+                        }
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
+</body>
+</html>

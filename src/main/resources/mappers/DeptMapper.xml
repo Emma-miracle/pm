@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hwua.dao.DeptMapper">
+    <!--统计部门信息条数-->
+    <select id="countDept" resultType="int">
+        select count(*) from dept;
+    </select>
+
+    <!--查询所有部门信息-->
+    <select id="getAllDepts" resultType="map">
+        select *
+        from dept d
+        left join sys_user e on(e.user_id=d.user_id)
+        order by d.dept_id desc
+    </select>
+
+    <!--查询员工中职务是部门或经理的-->
+
+
+    <!--部门编号 与 部门类型-->
+    <select id="getDeptName" resultType="dept">
+        select dept_id,dept_name
+        from dept
+        order by dept_id
+    </select>
+    <!--部门经理-->
+    <select id="getDeptManager" resultType="map">
+        select e.user_id,e.emp_name,j.job_id,j.job_type
+        from sys_user e
+        left join job j on(j.job_id=e.job_id)
+        where j.job_type like '%经理%'
+    </select>
+
+    <!--添加部门信息-->
+    <insert id="addDept" parameterType="dept">
+        insert into dept(dept_name,dept_code,dept_desc,user_id)
+        values(#{dept_name},#{dept_code},#{dept_desc},#{user_id});
+    </insert>
+
+    <!--更新部门信息-->
+    <update id="editDept" parameterType="dept">
+        update dept set
+            dept_name=#{dept_name},
+            dept_code=#{dept_code},
+            dept_desc=#{dept_desc},
+            user_id=#{user_id}
+        where dept_id=#{dept_id}
+    </update>
+
+    <!--删除单条部门信息-->
+    <delete id="delDept" parameterType="int">
+        delete from dept where dept_id=#{dept_id}
+    </delete>
+
+    <!--批量删除部门信息-->
+    <delete id="delDepts">
+        delete from dept where dept_id in
+        <foreach collection="list" item="dept_id" open="(" close=")" separator=",">
+            #{dept_id}
+        </foreach>
+    </delete>
+</mapper>

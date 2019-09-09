@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hwua.dao.JobMapper">
+    <!--统计职务信息条数-->
+    <select id="countJob" resultType="int">
+        select count(*) from job;
+    </select>
+
+    <!--查询所有职务信息-->
+    <select id="getAllJobs" resultType="map">
+        select *
+        from job
+        order by job_id desc
+    </select>
+
+    <select id="getJobName" resultType="job">
+        select job_id,job_name
+        from job
+        order by job_id
+    </select>
+
+    <select id="getJobType" resultType="job">
+        select  distinct job_type
+        from job
+        order by job_id
+    </select>
+
+    <!--职务名称不允许重复-->
+    <select id="getJobByName">
+        select *
+        from job
+        where job_name =#{job_name}
+        order by job_id;
+    </select>
+
+    <!--添加职务信息-->
+    <insert id="addJob" parameterType="job">
+        insert into job(job_type,job_name,job_code,job_desc,job_salary)
+        values(#{job_type},#{job_name},#{job_code},#{job_desc},#{job_salary});
+    </insert>
+
+    <!--更新职务信息-->
+    <update id="editJob" parameterType="job">
+        update job set
+            job_type=#{job_type},
+            job_name=#{job_name},
+            job_code=#{job_code},
+            job_desc=#{job_desc},
+            job_salary=#{job_salary}
+        where job_id=#{job_id}
+    </update>
+
+    <!--删除单条职务信息-->
+    <delete id="delJob" parameterType="int">
+        delete from job where job_id=#{job_id}
+    </delete>
+
+    <!--批量删除职务信息-->
+    <delete id="delJobs">
+        delete from job where job_id in
+        <foreach collection="list" item="job_id" open="(" close=")" separator=",">
+            #{job_id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>人事管理系统</title>
+    <link rel="icon" th:href="@{/static/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}">
+    <link rel="stylesheet" th:href="@{/static/assets/css/view.css}"/>
+    <script type="text/javascript" th:src="@{https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/static/js/xadmin.js}"></script>
+    <script th:src="@{/static/layui/layui.js}"></script>
+</head>
+<body class="layui-view-body">
+    <div class="layui-content">
+        <div class="layui-page-header">
+            <div class="pagewrap">
+                <span class="layui-breadcrumb">
+                  <a href="">首页</a>
+                  <a href="">系统管理</a>
+                  <a><cite>权限管理</cite></a>
+                </span>
+                <h2 class="title">权限</h2>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <div class="form-box">
+                        <button class="layui-btn layui-btn-blue" id="btn-add"><i class="layui-icon">&#xe654;</i>新增主菜单</button>
+                        <button class="layui-btn layui-btn-blue" id="btn-expand">全部展开</button>
+                        <button class="layui-btn layui-btn-blue" id="btn-fold">全部折叠</button>
+                        <button class="layui-btn layui-btn-blue" id="btn-reshpage">刷新页面</button>
+                        <button class="layui-btn layui-btn-blue" id="btn-refresh">刷新表格</button>
+                        <table width="100%" id="table1" class="layui-table" lay-filter="auth"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/html" id="oper-col">
+        {{#  if(d.is_valid == 0){ }}
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="stop">禁用</a>
+        {{#  } }}
+        {{#  if(d.is_valid == 1){ }}
+        <a class="layui-btn layui-btn layui-btn-xs" lay-event="open">启用</a>
+        {{#  } }}
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
+        <a class="layui-btn layui-btn layui-btn-xs" lay-event="add">添加子级</a>
+    </script>
+
+
+    <script th:inline="javascript">
+        var path=[[${#request.contextPath}]];
+    </script>
+    <script th:inline="none" type="text/javascript">
+        layui.config({
+            base: path+'/static/module/'
+        }).extend({
+            treetable: 'treetable-lay/treetable'
+        }).use(['layer', 'table', 'treetable'], function () {
+            var $ = layui.jquery;
+            var table = layui.table;
+            var layer = layui.layer;
+            var treetable = layui.treetable;
+
+            // 渲染表格
+            var renderTable = function () {
+                layer.load(2);
+                treetable.render({
+                    treeColIndex: 1,
+                    treeSpid: -1,
+                    treeIdName: 'id',
+                    treePidName: 'pid',
+                    //treeDefaultClose: true,
+                    treeLinkage: false,
+                    elem: '#table1',
+                    url: path+'/getJsonAuths',
+                    cols: [[
+                        {type: 'numbers',title:'序号'},
+                        {field: 'auth_name', title: '名称' ,width:'180'},
+                        {field: 'id', title: '编号',width:'60'},
+                        {field: 'auth_desc', title: '描述',width:'220'},
+                        {field: 'auth_code', title: '编码',width:'90'},
+                        {field: 'auth_layer', title: '层级',width:'60'},
+                        {field: 'auth_url', title: 'url',width:'95'},
+                        {field: 'orders', title: '排序',width:'70'},
+                        {field: 'pid', title: '父编号',width:'75'},
+                        {field: 'auth_type', title: '类型',width:'70',align: 'center',templet: function (d) {
+                            if (d.auth_type == 0) {
+                                return '<span class="layui-badge layui-bg-blue">目录</span>';
+                            }else {
+                                return '<span class="layui-badge-rim">按钮</span>';
+                            }
+                        }},
+                        {field: 'is_valid', title: '状态',width:'70',align: 'center',templet:function (d) {
+                            if (d.is_valid == 0) {
+                                return '<span class="layui-badge layui-bg-gray">有效</span>';
+                            }else {
+                                return '<span class="layui-badge-rim">无效</span>';
+                            }
+                        }},
+                        {templet: '#oper-col', title: '操作',width:'180'}
+                    ]],
+                    done: function () {
+                        layer.closeAll('loading');
+                    }
+                });
+            };
+
+            renderTable();
+
+            //添加数据
+            $("#btn-add").click(function () {
+                var param= "parent_id="+-1+"&auth_layer="+1;
+                x_admin_show('添加权限',path+'/admin_auth_add?'+param,'450','500');
+            });
+
+            $('#btn-expand').click(function () {
+                treetable.expandAll('#table1');
+            });
+
+            $('#btn-fold').click(function () {
+                treetable.foldAll('#table1');
+            });
+
+            $('#btn-reshpage').click(function () {
+                location.replace(location.href);
+            });
+
+            $('#btn-refresh').click(function () {
+                renderTable();
+            });
+
+
+            //监听工具条
+            table.on('tool(auth)', function (obj) {
+                var data = obj.data;
+                var layEvent = obj.event;
+
+                if (layEvent === 'stop') {
+                    var valid = data.is_valid;
+                    if(valid===0){
+                        layer.confirm('确认要禁用吗？', function (index) {
+                            valid=1;
+                            var param = "is_valid="+valid+"&auth_id="+data.id;
+                            console.log(data.auth_name);
+                            console.log(param);
+                            $.ajax({
+                                url: path + "/updateAuthStatus",
+                                data: param,
+                                type: "POST",
+                                dataType: "html",
+                                success: function (data) {
+                                    if (data == "ok") {
+                                        layer.msg('禁用成功!', {icon: 6, time: 1000});
+                                        renderTable();
+                                        treetable.expandAll('#table1');
+                                    } else {
+                                        layer.msg("您没有权限或网络异常!");
+                                    }
+                                }
+                            });
+                        });
+                    }
+
+                } else if (layEvent === 'open'){
+                    var valid = data.is_valid;
+                    if(valid===1){
+                        layer.confirm('确认要启动吗？', function (index) {
+                            valid=0;
+                            var param = "is_valid="+valid+"&auth_id="+data.id;
+                            console.log(data.auth_name);
+                            console.log(param);
+                            $.ajax({
+                                url: path + "/updateAuthStatus",
+                                data: param,
+                                type: "POST",
+                                dataType: "html",
+                                success: function (data) {
+                                    if (data == "ok") {
+                                        layer.msg('启用成功!', {icon: 6, time: 1000});
+                                        renderTable();
+                                        treetable.expandAll('#table1');
+                                    } else {
+                                        layer.msg("您没有权限或网络异常!!");
+                                    }
+                                }
+                            });
+                        });
+                    }
+
+                } else if (layEvent === 'edit') {
+                    var type=data.auth_type;
+                    var url=data.auth_url;
+                    if(url==null||url==undefined){
+                        url='';
+                    }
+
+                    var param="parent_id="+data.pid+"&auth_layer="+data.auth_layer
+                        +"&id="+data.id+"&auth_name="+data.auth_name+"&auth_code="+data.auth_code
+                        +"&auth_desc="+data.auth_desc+"&orders="+data.orders
+                        +"&auth_type="+type+"&auth_url="+url;
+                    x_admin_show('编辑权限',path+'/admin_auth_edit?'+param,'450','500')
+                } else if(layEvent==='add'){
+                    var parent_id=data.id;
+                    var auth_layer=data.auth_layer+1;
+                    x_admin_show('添加权限',path+'/admin_auth_add?parent_id='+parent_id+'&auth_layer='+auth_layer,'450','500')
+                }
+                //添加修改可以使用同一个页面 也可以使用同一个事件
+                //添加权限的时候，打开一个一面，页面框 都是没东西
+                //编辑权限的时候，打开一个页面
+                //不需要传入权限的id 修改需要传
+                //后台就判断你有没有传id过来，传了就是修改，没传就是添加
+            });
+        });
+    </script>
+</body>
+</html>

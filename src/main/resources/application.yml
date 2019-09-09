@@ -1,0 +1,40 @@
+server:
+  servlet:
+    context-path: /pm
+  port: 8888
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    username: root
+    password: 888888
+    url: jdbc:mysql://localhost:3306/pm?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8
+    driver-class-name: com.mysql.jdbc.Driver
+    initialSize: 5
+    maxActive: 20
+
+  mvc:
+    static-path-pattern: /static/**
+  resources:
+    static-locations: ["classpath:/static/"]
+  thymeleaf:
+    cache: false
+  jpa:
+    show-sql: true
+
+mybatis:
+  type-aliases-package: com.hwua.po
+  mapper-locations: classpath:mappers/*.xml
+
+logging:
+  level: {"com.hwua": "trace"}
+
+
+#分页插件
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+
+

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hwua.dao.EmpMapper">
+    <select id="countEmp" resultType="int" parameterType="map">
+        select count(*)
+        from sys_user e
+        left join dept d on(d.dept_id=e.dept_id)
+        left join job j on(j.job_id=e.job_id)
+        <where>
+            <if test="keyword!=null and keyword!=''">
+                (username like concat('%',#{keyword},'%')
+                or emp_name like concat('%',#{keyword},'%')
+                or age like concat('%',#{keyword},'%')
+                or job_name like concat('%',#{keyword},'%')
+                or idcard like concat('%',#{keyword},'%')
+                or email like concat('%',#{keyword},'%')
+                or phone like concat('%',#{keyword},'%')
+                or dept_name like concat('%',#{keyword},'%')
+                or salary like concat('%',#{keyword},'%')
+                or bonus like concat('%',#{keyword},'%')
+                or seniority like concat('%',#{keyword},'%'))
+            </if>
+            <if test="sex!=null">
+               and sex = #{sex}
+            </if>
+        </where>
+    </select>
+
+    <select id="getAllEmps" resultType="map" parameterType="map">
+        select *
+        from sys_user e
+        left join dept d on(d.dept_id=e.dept_id)
+        left join job j on(j.job_id=e.job_id)
+        <where>
+            <if test="keyword!=null and keyword!=''">
+                (username like concat('%',#{keyword},'%')
+                or emp_name like concat('%',#{keyword},'%')
+                or age like concat('%',#{keyword},'%')
+                or job_name like concat('%',#{keyword},'%')
+                or idcard like concat('%',#{keyword},'%')
+                or email like concat('%',#{keyword},'%')
+                or phone like concat('%',#{keyword},'%')
+                or dept_name like concat('%',#{keyword},'%')
+                or salary like concat('%',#{keyword},'%')
+                or bonus like concat('%',#{keyword},'%')
+                or seniority like concat('%',#{keyword},'%'))
+            </if>
+            <if test="sex!=null">
+               and sex = #{sex}
+            </if>
+        </where>
+        order by e.user_id desc
+    </select>
+
+    <select id="checkUserName">
+
+    </select>
+
+
+    <insert id="addEmp" parameterType="sys_user">
+        insert into sys_user(username,password,emp_name,sex,age,job_id,
+        idcard,email,phone,dept_id,salary,bonus,hiredate,
+        seniority,is_valid)
+        values(#{username},#{password},#{emp_name},#{sex},#{age},#{job_id},
+        #{idcard},#{email},#{phone},#{dept_id},#{salary},
+        #{bonus},#{hiredate},#{seniority},0);
+    </insert>
+
+    <update id="editEmp" parameterType="sys_user">
+        update sys_user set
+            username=#{username},
+            password=#{password},
+            emp_name=#{emp_name},
+            sex=#{sex},
+            age=#{age},
+            job_id=#{job_id},
+            idcard=#{idcard},
+            email=#{email},
+            phone=#{phone},
+            dept_id=#{dept_id},
+            salary=#{salary},
+            bonus=#{bonus},
+            hiredate=#{hiredate},
+            seniority=#{seniority}
+        where user_id=#{user_id}
+    </update>
+
+    <update id="updateStatus" parameterType="sys_user">
+        update sys_user set is_valid = #{is_valid} where user_id=#{user_id}
+    </update>
+
+    <select id="countLeave" resultType="int">
+        select count(*)
+        from sys_user e
+        join job j on(j.job_id=e.job_id)
+        join dept d on(d.dept_id=e.dept_id)
+        join leave_record lr on(lr.user_id=e.user_id)
+    </select>
+
+    <select id="getAllLeaveRecord" resultType="map">
+        select *
+        from sys_user e
+        join job j on(j.job_id=e.job_id)
+        join dept d on(d.dept_id=e.dept_id)
+        join leave_record lr on(lr.user_id=e.user_id)
+    </select>
+
+    <insert id="addLeaveRecord" parameterType="leave_record">
+        insert into leave_record (user_id,leave_type,start_date,end_date,times,reason)
+        values (#{user_id},#{leave_type},#{start_date},#{end_date},#{times},#{reason},0)
+    </insert>
+
+    <update id="editLeaveRecord" parameterType="leave_record">
+        update  set leave_record
+        user_id=#{user_id},
+        leave_type=#{leave_type},
+        start_date=#{start_date},
+        end_date=#{end_date},
+        times=#{times},
+        reason=#{reason}
+        where leave_id=#{leave_id}
+    </update>
+
+    <update id="updateLeaveStatus" parameterType="leave_record">
+        update leave_record set
+        stauts=#{status}
+        where leave_id=#{leave_id}
+    </update>
+
+    <select id="countTrip" resultType="int">
+        select count(*)
+        from sys_user e
+        join job j on(j.job_id=e.job_id)
+        join dept d on(d.dept_id=e.dept_id)
+        join trip_record tr on(tr.user_id=e.user_id)
+    </select>
+
+    <select id="getAllTripRecord" resultType="map">
+        select *
+        from sys_user e
+        join job j on(j.job_id=e.job_id)
+        join dept d on(d.dept_id=e.dept_id)
+        join trip_record tr on(tr.user_id=e.user_id)
+    </select>
+
+    <insert id="addTripRecord" parameterType="trip_record">
+        insert into trip_record (user_id,trip_city,trip_reason,trip_start,trip_end,days,trip_money)
+        values (#{user_id},#{trip_city},#{trip_reason},#{trip_start},#{trip_end},#{days},#{trip_money})
+    </insert>
+
+    <update id="editTripRecord" parameterType="trip_record">
+        update set trip_record
+        user_id=#{user_id},
+        trip_city=#{trip_city},
+        trip_reason=#{trip_reason},
+        trip_start=#{trip_start},
+        trip_end=#{trip_end},
+        days=#{days},
+        trip_money=#{trip_money}
+        where trip_id=#{trip_id}
+    </update>
+
+
+</mapper>

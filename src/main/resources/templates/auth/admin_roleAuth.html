@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>人事管理系统</title>
+    <link rel="icon" th:href="@{/static/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}">
+    <link rel="stylesheet" th:href="@{/static/assets/css/view.css}"/>
+    <script type="text/javascript" th:src="@{https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/static/js/xadmin.js}"></script>
+</head>
+<body class="layui-view-body">
+    <div class="layui-content">
+        <div class="layui-page-header">
+            <div class="pagewrap">
+                <span class="layui-breadcrumb">
+                  <a href="">首页</a>
+                  <a href="">系统管理</a>
+                  <a><cite>授予权限</cite></a>
+
+                </span>
+                <h2 class="title">
+                    授权
+                </h2>
+
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <div class="form-box">
+                        <div class="layui-form layui-form-item">
+                            <button class="layui-btn layui-btn-blue" id="btn-add"><i class="layui-icon">&#xe654;</i>授权</button>
+                            <button class="layui-btn layui-btn-blue" id="btn-reshpage">刷新页面</button>
+                            <button class="layui-btn layui-btn-blue" id="btn-refresh">刷新表格</button>
+                            <div class="layui-inline" style="margin-left: 180px">
+                                <form action="javascript:void(0)">
+                                    <div class="layui-form-mid">角色:</div>
+                                    <div class="layui-input-inline" style="width: 130px;">
+                                        <select name="role_id" id="role_id">
+                                            <option value="">---角色类型---</option>
+                                            <option th:each="e:${roleName}" th:value="${e.role_id}" th:text="${e.role_name}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="layui-form-mid">权限:</div>
+                                    <div class="layui-input-inline" style="width: 130px;">
+                                        <select id="auth_id" name="auth_id">
+                                            <option value="">---权限类型---</option>
+                                            <option th:each="a:${authName}" th:value="${a.auth_id}" th:text="${a.auth_name}"></option>
+                                        </select>
+                                    </div>
+                                    <button class="layui-btn layui-btn-blue" data-type="reload" id="search">查询</button>
+                                    <button class="layui-btn layui-btn-primary" type="reset">重置</button>
+                                </form>
+                            </div>
+                        </div>
+
+
+                        <!--<button class="layui-btn layui-btn-blue" id="btn-add">添加主菜单</button>-->
+                        <table class="layui-table" id="roles" lay-filter="roles" width="100%"></table>
+                        <!-- 操作列 -->
+                        <script type="text/html" id="oper-col">
+                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">取消授权</a>
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script th:inline="javascript">
+        var path=[[${#request.contextPath}]];
+    </script>
+    <script th:inline="none" type="text/javascript">
+        layui.use('table', function(){
+            var table = layui.table;
+            /*var tableContent = new Array();*/
+            var renderTable= function(){
+                // 存放数据表格中的数据的对象数组tableContent
+                //方法级渲染
+                table.render({
+                    elem: '#roles'
+                    /*,data : tableContent*/
+                    ,url: path+'/getJsonRoleAuths'
+                    ,cellMinWidth: 80
+                    ,cols: [[
+                        {checkbox: true}
+                        ,{type: 'numbers',title:'序号'}
+                        ,{field:'role_name', title: '角色类型', width:120}
+                        ,{field:'auth_name', title: '角色权限', width:130}
+                        ,{field:'auth_desc', title: '权限描述', width:300}
+                        ,{field: 'auth_type', title: '类型',width:100,align: 'center',templet: function (d) {
+                            if (d.auth_type == 0) {
+                                return '<span class="layui-badge layui-bg-blue">目录</span>';
+                            }else {
+                                return '<span class="layui-badge-rim">按钮</span>';
+                            }
+                        }}
+                        ,{field:'is_valid', title: '角色状态', width:100,align: 'center',templet:function (d) {
+                                if (d.is_valid == 0) {
+                                    return '<span class="layui-badge layui-bg-blue">有效</span>';
+                                }else {
+                                    return '<span class="layui-badge-rim">无效</span>';
+                                }
+                            }}
+                        ,{templet: '#oper-col', title: '操作',width:172,align: 'center'}
+                    ]]
+                    ,id:'testReload'
+                    ,page: {
+                        first:'首页',
+                        last:'尾页'
+                    }
+                   /* ,done: function(res, curr, count){
+                        //如果是异步请求数据方式，res即为你接口返回的信息。
+                        //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                        console.log(res);
+                        //得到当前页码
+                        console.log(curr);
+                        //得到数据总量
+                        console.log(count);
+                    }*/
+                });
+            };
+            renderTable();
+
+
+
+
+            //关键字查询
+            var $ = layui.$, active = {
+                reload: function(){
+                    var role_id = $('#role_id');
+                    var auth_id=$('#auth_id');
+
+                    //执行重载
+                    table.reload('testReload', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                        ,where: {
+                            role_id: role_id.val(),
+                            auth_id:auth_id.val()
+                        }
+                    });
+                }
+            };
+
+
+            $('#search').on('click', function(){
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+/*
+
+            //获取每页显示的记录数、当前记录总数，计算新添加的记录在第几页
+            var totalRecord = tableContent.length;
+            var pageSize = $(".layui-laypage-limits").find("select").val();
+            if($.type(pageSize) == "string"){
+                pageSize = parseInt(pageSize);
+            }
+
+
+            var currPageNo = Math.ceil(totalRecord / pageSize);
+            console.log("每页显示的记录数："+pageSize+" 类型："+$.type(pageSize)+" 总的记录数："+totalRecord+" 类型："+$.type(totalRecord)
+                +" 新增行所在页码："+currPageNo+" 类型："+$.type(currPageNo));
+*/
+
+
+            //添加数据
+            $("#btn-add").click(function () {
+                x_admin_show('授权',path+'/admin_roleAuth_edit','360','350');
+                /*table.reload('testReload', {
+
+                    page: {
+                        curr: currPageNo
+                        ,data : tableContent
+                    }
+                });
+                */
+            });
+
+
+            //刷新页面
+            $('#btn-reshpage').click(function () {
+                location.replace(location.href);
+            });
+
+            //刷新表格
+            $('#btn-refresh').click(function () {
+                renderTable();
+            });
+
+
+
+            //监听工具条
+            table.on('tool(roles)', function(obj){
+                var data = obj.data;
+                var layEvent = obj.event;
+                if (layEvent === 'del') {
+                    layer.confirm('确认要取消吗？', function (index) {
+                        var param = "dbid="+data.dbid;
+                        console.log(data.role_name);
+                        console.log(data.auth_name);
+                        console.log(param);
+                        $.ajax({
+                            url: path + "/delRoleAuth",
+                            data: param,
+                            type: "POST",
+                            dataType: "html",
+                            success: function (data) {
+                                if (data == "ok") {
+                                    layer.msg('取消成功!', {icon: 6, time: 1000});
+                                    renderTable();
+                                }else {
+                                    layer.msg("取消失败,您没有权限或网络异常!", {icon: 4, time: 1500});
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
