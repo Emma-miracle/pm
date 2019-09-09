@@ -7,11 +7,6 @@ import com.hwua.po.PBank;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @Author:王新凤
- * @Date:2019/1/19 22:27
- * @Version 1.0
- */
 
 
 public interface AccountService {
