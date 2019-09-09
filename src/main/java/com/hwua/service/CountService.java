@@ -1,10 +1,6 @@
 package com.hwua.service;
 
-/**
- * @Author:王新凤
- * @Date:2019/1/22 15:01
- * @Version 1.0
- */
+
 
 
 public interface CountService {
