@@ -1,10 +1,5 @@
 package com.hwua.dao;
 
-/**
- * @Author:王新凤
- * @Date:2019/1/22 14:55
- * @Version 1.0
- */
 
 
 public interface CountMapper {
